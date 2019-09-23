@@ -1,4 +1,4 @@
-import { insert, findAll, findOne, find } from "./MongoCollection";
+import { insert, findAll, findOne, find, update, deleteOne } from "./MongoCollection";
 
 const COLLECTION = 'people';
 
@@ -16,4 +16,12 @@ export async function findPerson(person) {
 
 export async function searchPerson(person) {
     return await find(COLLECTION, person);
+}
+
+export async function updatePerson(id, person) {
+    return await update(COLLECTION, id, person);
+}
+
+export async function deletePerson(id) {
+    return await deleteOne(COLLECTION, id);
 }

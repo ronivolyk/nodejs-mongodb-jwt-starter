@@ -15,3 +15,11 @@ export async function findOne(collectionName, document) {
 export async function find(collectionName, document) {
     return await collection(collectionName).find(document).toArray();
 }
+
+export async function update(collectionName, id, document) {
+    return await collection(collectionName).update(id, document);
+}
+
+export async function deleteOne(collectionName, id) {
+    return await collection(collectionName).deleteOne(id);
+}
