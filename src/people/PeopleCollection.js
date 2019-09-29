@@ -1,4 +1,4 @@
-import { MongoCollection } from "./MongoCollection";
+import { MongoCollection } from "../mongo/MongoCollection";
 
 const COLLECTION_NAME = 'people';
 
