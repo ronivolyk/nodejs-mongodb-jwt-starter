@@ -15,8 +15,13 @@ app.use('/', (req, res, next) => {
     next();
 })
 
-app.get('/people', (req, res) => {
-    peopleCollection.find(req.query).then(data => res.send(`Quantidade: ${data.length} \n ${JSON.stringify(data)}`));
+app.get('/people', (req, res, next) => {
+    peopleCollection.find(req.query)
+        .then(data => {
+            res.write(`Quantidade: ${data.length} \n ${JSON.stringify(data)}`);
+            next();
+        })
+        .catch(err => next(err));
 })
 
 app.get('/people/:id', (req, res) => {
@@ -34,6 +39,16 @@ app.put('/people/:id', (req, res) => {
 
 app.delete('/people/:id', (req, res) => {
     peopleCollection.deleteOne({ _id: new ObjectId(req.params.id) }).then(data => res.end(`Removeu ${JSON.stringify(data)}`));
+})
+
+app.use('/', (req, res, next) => {
+    console.log(`${new Date()} - Finish request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)} }`);
+    res.end();
+})
+
+app.use('/', (err, req, res, next) => {
+    console.log(`${new Date()} - Error request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)}, error: ${err} }`);
+    res.status(500).send(`Error: ${err}`);
 })
 
 connectMongo().then(() => startServer(), error => finishWithError(error));

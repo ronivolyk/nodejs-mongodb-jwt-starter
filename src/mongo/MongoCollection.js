@@ -6,16 +6,16 @@ export class MongoCollection {
         this.collectionName = collectionName;
     }
 
-    async insertOne(document) {
-        return await collection(this.collectionName).insertOne(document);
+    async find(document) {
+        return await collection(this.collectionName).find(document).toArray();
     }
 
     async findOne(document) {
         return await collection(this.collectionName).findOne(document);
     }
 
-    async find(document) {
-        return await collection(this.collectionName).find(document).toArray();
+    async insertOne(document) {
+        return await collection(this.collectionName).insertOne(document);
     }
 
     async updateOne(id, document) {
