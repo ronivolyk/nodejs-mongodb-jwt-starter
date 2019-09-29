@@ -6,12 +6,8 @@ export class MongoCollection {
         this.collectionName = collectionName;
     }
 
-    async insert(document) {
+    async insertOne(document) {
         return await collection(this.collectionName).insertOne(document);
-    }
-
-    async findAll() {
-        return await collection(this.collectionName).find({}).toArray();
     }
 
     async findOne(document) {
@@ -22,8 +18,8 @@ export class MongoCollection {
         return await collection(this.collectionName).find(document).toArray();
     }
 
-    async update(id, document) {
-        return await collection(this.collectionName).update(id, document);
+    async updateOne(id, document) {
+        return await collection(this.collectionName).updateOne(id, { $set: document });
     }
 
     async deleteOne(id) {
