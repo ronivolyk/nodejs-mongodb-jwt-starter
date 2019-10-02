@@ -5,31 +5,64 @@ import { PeopleCollection } from './PeopleCollection';
 let peopleCollection = new PeopleCollection();
 
 const router = express.Router();
+const ROUTER_NAME = '/people';
 
-router.get('/people', (req, res, next) => {
-    peopleCollection.find(req.query)
+router.route(ROUTER_NAME)
+    .get((req, res, next) => {
+        peopleCollection.find(req.query)
+            .then(data => {
+                res.result = { msg: `${data.length} ${data.length === 1 ? 'person' : 'people'} found`, data: data };
+                next();
+            })
+            .catch(err => next(err));
+    })
+    .post((req, res, next) => {
+        peopleCollection.insertOne(req.body)
+            .then(data => {
+                res.result = { msg: `${req.body._id} inserted`, data: data };
+                next();
+            })
+            .catch(err => next(err));
+    })
+
+router.route(`${ROUTER_NAME}/:id`)
+    .all((req, res, next) => {
+        peopleCollection.findOne({ _id: new ObjectId(req.params.id) })
+            .then(data => {
+                req.document = data;
+                next();
+            })
+            .catch(err => next(err));
+    })
+    .get((req, res, next) => {
+        res.result = { msg: `${req.params.id} ${req.document ? 'found' : 'not found'}`, data: req.document };
+        next();
+    })
+    .put((req, res, next) => {
+        if (!req.document) {
+            res.result = { msg: `${req.params.id} not found` };
+            next();
+        }
+
+        peopleCollection.updateOne({ _id: new ObjectId(req.params.id) }, req.body)
         .then(data => {
-            res.write(`Quantidade: ${data.length} \n ${JSON.stringify(data)}`);
+            res.result = { msg: `${req.params.id} updated`, data: data};
             next();
         })
         .catch(err => next(err));
-})
+    })
+    .delete((req, res, next) => {
+        if (!req.document) {
+            res.result = { msg: `${req.params.id} not found` };
+            next();
+        }
 
-router.get('/people/:id', (req, res) => {
-    let id = { _id: new ObjectId(req.params.id) };
-    peopleCollection.findOne(id).then(data => res.end(`Encontrou ${JSON.stringify(data)}`));
-})
-
-router.post('/people', (req, res) => {
-    peopleCollection.insertOne(req.body).then(data => res.end(`Inseriu ${JSON.stringify(data.ops)}`));
-})
-
-router.put('/people/:id', (req, res) => {
-    peopleCollection.updateOne({ _id: new ObjectId(req.params.id) }, req.body).then(data => res.end(`Atualizou ${JSON.stringify(data)}`));
-})
-
-router.delete('/people/:id', (req, res) => {
-    peopleCollection.deleteOne({ _id: new ObjectId(req.params.id) }).then(data => res.end(`Removeu ${JSON.stringify(data)}`));
-})
+        peopleCollection.deleteOne({ _id: new ObjectId(req.params.id) })
+        .then(data => {
+            res.result = { msg: `${req.params.id} deleted`, data: data};
+            next();
+        })
+        .catch(err => next(err));
+    })
 
 export default router;

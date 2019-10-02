@@ -13,11 +13,13 @@ app.use('/', (req, res, next) => {
     next();
 })
 
-app.use('/', peopleRouter);
+app.use(peopleRouter);
 
 app.use('/', (req, res, next) => {
-    console.log(`${new Date()} - Finish request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)} }`);
-    res.end();
+    console.log(`${new Date()} - End request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)} }`);
+
+    if (res.result) res.send(res.result);
+    else res.end();
 })
 
 app.use('/', (err, req, res, next) => {
