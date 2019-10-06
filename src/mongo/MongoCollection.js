@@ -1,28 +1,13 @@
 let collection = collectionName => global.connection.collection(collectionName);
 
-export class MongoCollection {
-
-    constructor(collectionName) {
-        this.collectionName = collectionName;
+let mongoCollection = (collectionName) => {
+    return {
+        find: async (document) => await collection(collectionName).find(document).toArray(),
+        findOne: async (document) => await collection(collectionName).findOne(document),
+        insertOne: async (document) => await collection(collectionName).insertOne(document),
+        updateOne: async (id, document) => await collection(collectionName).updateOne(id, { $set: document }),
+        deleteOne: async (id) => await collection(collectionName).deleteOne(id)
     }
+};
 
-    async find(document) {
-        return await collection(this.collectionName).find(document).toArray();
-    }
-
-    async findOne(document) {
-        return await collection(this.collectionName).findOne(document);
-    }
-
-    async insertOne(document) {
-        return await collection(this.collectionName).insertOne(document);
-    }
-
-    async updateOne(id, document) {
-        return await collection(this.collectionName).updateOne(id, { $set: document });
-    }
-
-    async deleteOne(id) {
-        return await collection(this.collectionName).deleteOne(id);
-    }
-}
+export default mongoCollection;

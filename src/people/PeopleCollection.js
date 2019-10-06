@@ -1,9 +1,5 @@
-import { MongoCollection } from "../mongo/MongoCollection";
+import mongoCollection from "../mongo/MongoCollection";
 
-const COLLECTION_NAME = 'people';
+let peopleCollection = mongoCollection('people');
 
-export class PeopleCollection extends MongoCollection {
-    constructor() {
-        super(COLLECTION_NAME);
-    }
-}
+export default peopleCollection;

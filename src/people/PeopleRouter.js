@@ -1,8 +1,6 @@
 import express from 'express';
 import { ObjectId } from 'mongodb';
-import { PeopleCollection } from './PeopleCollection';
-
-let peopleCollection = new PeopleCollection();
+import peopleCollection from './PeopleCollection';
 
 const router = express.Router();
 const ROUTER_NAME = '/people';
