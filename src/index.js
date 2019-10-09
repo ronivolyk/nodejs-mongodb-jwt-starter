@@ -1,5 +1,6 @@
 import express from 'express';
 import { connect as connectMongo } from './mongo/Mongo';
+import usersRouter from './users/UsersRouter';
 import peopleRouter from './people/PeopleRouter';
 
 const PORT = 8080;
@@ -13,6 +14,7 @@ app.use('/', (req, res, next) => {
     next();
 })
 
+app.use(usersRouter);
 app.use(peopleRouter);
 
 app.use('/', (req, res, next) => {
