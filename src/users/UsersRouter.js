@@ -19,37 +19,43 @@ router.route(ROUTER_NAME)
     .post((req, res, next) => {
         usersCollection.findOne({ email: req.body.email })
             .then(data => {
-                if (!data) {
-                    usersCollection.findOne({ username: req.body.username })
-                    .then(data => {
-                        if (!data) {
-                            Crypto.getHash(req.body.password).then(hash => {
-                                let user = {
-                                    name: req.body.name,
-                                    email: req.body.email,
-                                    username: req.body.username,
-                                    password: hash
-                                };
-                        
-                                usersCollection.insertOne(user)
-                                .then(data => {
-                                    res.result = { msg: `${user._id} inserted`, data: data };
-                                    next();
-                                })
-                                .catch(err => next(err));
-                            });
-                        } else {
-                            res.result = { msg: `Username ${req.body.username} is already registered` };
-                            next();                
-                        }
-                    })
-                    .catch(err => next(err));
-                } else {
-                    res.result = { msg: `E-mail ${req.body.email} is already registered` };
-                    next();        
-                }
+                res.isEmailAvailable = data == null;
+                next();
             })
             .catch(err => next(err));
+    })
+    .post((req, res, next) => {
+        usersCollection.findOne({ username: req.body.username })
+            .then(data => {
+                res.isUsernameAvailable = data == null;
+                next();
+            })
+            .catch(err => next(err));
+    })
+    .post((req, res, next) => {
+        if (!res.isEmailAvailable) {
+            res.result = { msg: `E-mail ${req.body.email} is already registered` };
+            next();
+        } else if (!res.isUsernameAvailable) {
+            res.result = { msg: `Username ${req.body.username} is already registered` };
+            next();
+        } else {
+            Crypto.getHash(req.body.password).then(hash => {
+                let user = {
+                    name: req.body.name,
+                    email: req.body.email,
+                    username: req.body.username,
+                    password: hash
+                };
+        
+                usersCollection.insertOne(user)
+                .then(data => {
+                    res.result = { msg: `${user._id} inserted`, data: data };
+                    next();
+                })
+                .catch(err => next(err));
+            });    
+        }
     })
 
 router.route(`${ROUTER_NAME}/:id`)
