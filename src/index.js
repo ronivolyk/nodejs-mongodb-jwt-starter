@@ -26,7 +26,8 @@ app.use('/', (req, res, next) => {
 
 app.use('/', (err, req, res, next) => {
     console.log(`${new Date()} - Error request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)}, error: ${err} }`);
-    res.status(500).send(`Error: ${err}`);
+    console.log(`Error: ${err.stack}`);
+    res.status(500).send({ error: `${err.name}: ${err.message}` });
 })
 
 connectMongo().then(() => startServer(), error => finishWithError(error));
