@@ -17,10 +17,19 @@ app.use('/', (req, res, next) => {
 app.use(usersRouter);
 app.use(peopleRouter);
 
+app.use('/', async (req, res, next) => {
+    try {
+        req.result = await req.handler;
+        next();
+    } catch (e) {
+        next(e);
+    }
+})
+
 app.use('/', (req, res, next) => {
     console.log(`${new Date()} - End request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)} }`);
 
-    if (res.result) res.send(res.result);
+    if (req.result) res.send(req.result);
     else res.end();
 })
 
