@@ -1,11 +1,14 @@
 import { ObjectId } from 'mongodb';
 import * as Crypto from '../security/Crypto';
-import usersCollection from './UsersCollection';
+import mongoCollection from "../mongo/MongoCollection";
 
+const COLLECTION_NAME = 'users';
 const PROJECTION = { password: 0 };
 
+let collection = mongoCollection(COLLECTION_NAME);
+
 export async function find(queryUser) {
-    let users = await usersCollection.find(queryUser, PROJECTION);
+    let users = await collection.find(queryUser, PROJECTION);
 
     return {
         msg: `${users.length} ${users.length === 1 ? 'user' : 'users'} found`,
@@ -35,7 +38,7 @@ export async function insert(user) {
         password: hash
     };
 
-    let result = await usersCollection.insertOne(user);
+    let result = await collection.insertOne(user);
 
     return {
         msg: `${user._id} inserted`,
@@ -45,7 +48,7 @@ export async function insert(user) {
 
 export async function findById(id) {
     let _id = { _id: new ObjectId(id) };
-    let result = await usersCollection.findOne(_id, PROJECTION);
+    let result = await collection.findOne(_id, PROJECTION);
 
     return {
         msg: `${id} ${result ? 'found' : 'not found'}`,
@@ -54,7 +57,7 @@ export async function findById(id) {
 }
 
 export async function findByEmail(email) {
-    let result = await usersCollection.findOne({ email }, PROJECTION);
+    let result = await collection.findOne({ email }, PROJECTION);
 
     return {
         msg: `${email} ${result ? 'found' : 'not found'}`,
@@ -63,7 +66,7 @@ export async function findByEmail(email) {
 }
 
 export async function findByUsername(username) {
-    let result = await usersCollection.findOne({ username }, PROJECTION);
+    let result = await collection.findOne({ username }, PROJECTION);
 
     return {
         msg: `${username} ${result ? 'found' : 'not found'}`,
@@ -86,7 +89,7 @@ export async function updateById(id, user) {
         email: (user.email) ? user.email : userFound.email
     };
 
-    let result = await usersCollection.updateOne(_id, user);
+    let result = await collection.updateOne(_id, user);
 
     return {
         msg: `${id} updated`,
@@ -106,7 +109,7 @@ export async function deleteById(id) {
 
     let updateQuery = { deactivated: true }
 
-    let result = await usersCollection.updateOne(_id, updateQuery)
+    let result = await collection.updateOne(_id, updateQuery)
 
     return {
         msg: `${id} deactivated`,

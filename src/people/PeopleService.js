@@ -1,8 +1,12 @@
 import { ObjectId } from 'mongodb';
-import peopleCollection from './PeopleCollection';
+import mongoCollection from "../mongo/MongoCollection";
+
+const COLLECTION_NAME = 'people';
+
+let collection = mongoCollection(COLLECTION_NAME);
 
 export async function find(query) {
-    let people = await peopleCollection.find(query);
+    let people = await collection.find(query);
 
     return {
         msg: `${people.length} ${people.length === 1 ? 'person' : 'people'} found`,
@@ -11,7 +15,7 @@ export async function find(query) {
 }
 
 export async function insert(person) {
-    let result = await peopleCollection.insertOne(person);
+    let result = await collection.insertOne(person);
 
     return {
         msg: `${person._id} inserted`,
@@ -21,7 +25,7 @@ export async function insert(person) {
 
 export async function findById(id) {
     let _id = { _id: new ObjectId(id) };
-    let result = await peopleCollection.findOne(_id);
+    let result = await collection.findOne(_id);
 
     return {
         msg: `${id} ${result ? 'found' : 'not found'}`,
@@ -38,7 +42,7 @@ export async function updateById(id, person) {
     }
 
     let _id = { _id: personFound._id };
-    let result = await peopleCollection.updateOne(_id, person);
+    let result = await collection.updateOne(_id, person);
 
     return {
         msg: `${id} updated`,
@@ -55,7 +59,7 @@ export async function deleteById(id) {
     }
 
     let _id = { _id: personFound._id };
-    let result = await peopleCollection.deleteOne(_id);
+    let result = await collection.deleteOne(_id);
 
     return {
         msg: `${id} deleted`,
