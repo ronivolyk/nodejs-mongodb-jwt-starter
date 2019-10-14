@@ -1,48 +1,31 @@
 import express from 'express';
 import { connect as connectMongo } from './mongo/Mongo';
-import usersRouter from './users/UsersRouter';
-import peopleRouter from './people/PeopleRouter';
+import usersController from './users/UsersController';
+import peopleController from './people/PeopleController';
+import requestController from './RequestController';
+import responseController from './ResponseController';
 
 const PORT = 8080;
 
 const app = express();
 
 app.use(express.json());
+app.use(requestController);
 
-app.use('/', (req, res, next) => {
-    console.log(`${new Date()} - New request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)} }`);
-    next();
-})
+app.use(usersController);
+app.use(peopleController);
 
-app.use(usersRouter);
-app.use(peopleRouter);
+app.use(responseController);
 
-app.use('/', async (req, res, next) => {
+init();
+
+async function init() {
     try {
-        req.result = await req.handler;
-        next();
+        await connectMongo();
+        app.listen(PORT, () => console.log(`Server listening to port ${PORT}`));
     } catch (e) {
-        next(e);
+        finishWithError(e);
     }
-})
-
-app.use('/', (req, res, next) => {
-    console.log(`${new Date()} - End request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)} }`);
-
-    if (req.result) res.send(req.result);
-    else res.end();
-})
-
-app.use('/', (err, req, res, next) => {
-    console.log(`${new Date()} - Error request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)}, error: ${err} }`);
-    console.log(`Error: ${err.stack}`);
-    res.status(500).send({ error: `${err.name}: ${err.message}` });
-})
-
-connectMongo().then(() => startServer(), error => finishWithError(error));
-
-function startServer() {
-    app.listen(PORT, () => console.log(`Server listening to port ${PORT}`));
 }
 
 function finishWithError(error) {

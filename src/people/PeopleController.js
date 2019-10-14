@@ -1,10 +1,11 @@
 import express from 'express';
-import * as service from './UsersService'
+import * as service from './PeopleService';
 
-const router = express.Router();
-const ROUTER_NAME = '/users';
+const CONTROLLER_NAME = '/people';
 
-router.route(ROUTER_NAME)
+let router = express.Router();
+
+router.route(CONTROLLER_NAME)
     .get((req, res, next) => {
         req.handler = service.find(req.query);
         next();
@@ -14,7 +15,7 @@ router.route(ROUTER_NAME)
         next();
     })
 
-router.route(`${ROUTER_NAME}/:id`)
+router.route(`${CONTROLLER_NAME}/:id`)
     .get((req, res, next) => {
         req.handler = service.findById(req.params.id);
         next();
