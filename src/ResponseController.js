@@ -12,16 +12,27 @@ router.use(async (req, res, next) => {
 })
 
 router.use((req, res, next) => {
-    console.log(`${new Date()} - End request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)} }`);
+    let statusCode = 200;
+
+    if (req.result && req.result.statusCode) {
+        statusCode = req.result.statusCode;
+    }
+
+    console.log(`${new Date()} - End request: { method: ${req.method}, url: ${req.url}, statusCode: ${statusCode} }`);
+
+    res.status(statusCode);
 
     if (req.result) res.send(req.result);
     else res.end();
 })
 
 router.use((err, req, res, next) => {
-    console.log(`${new Date()} - Error request: { method: ${req.method}, url: ${req.url}, body: ${JSON.stringify(req.body)}, error: ${err} }`);
+    let statusCode = 500;
+
+    console.log(`${new Date()} - Error request: { method: ${req.method}, url: ${req.url}, statusCode: ${statusCode}, error: ${err} }`);
     console.log(`Error: ${err.stack}`);
-    res.status(500).send({ error: `${err.name}: ${err.message}` });
+
+    res.status(statusCode).send({ error: `${err.name}: ${err.message}` });
 })
 
 export default router;

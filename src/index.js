@@ -1,9 +1,11 @@
 import express from 'express';
 import { connect as connectMongo } from './mongo/Mongo';
-import usersController from './users/UsersController';
-import peopleController from './people/PeopleController';
 import requestController from './RequestController';
 import responseController from './ResponseController';
+
+import authController from './security/AuthController';
+import usersController from './users/UsersController';
+import peopleController from './people/PeopleController';
 
 const PORT = 8080;
 
@@ -12,6 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(requestController);
 
+app.use(authController);
 app.use(usersController);
 app.use(peopleController);
 

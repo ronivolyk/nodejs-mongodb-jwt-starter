@@ -1,9 +1,10 @@
 import { ObjectId } from 'mongodb';
-import * as Crypto from '../security/Crypto';
+import * as crypto from '../security/Crypto';
 import mongoCollection from "../mongo/MongoCollection";
 
 const COLLECTION_NAME = 'users';
 const PROJECTION = { password: 0 };
+const PROJECTION_WITH_PASSWORD = { password: 1 };
 
 let collection = mongoCollection(COLLECTION_NAME);
 
@@ -29,7 +30,7 @@ export async function insert(user) {
         return { msg: `Username ${user.username} is already registered` };
     }
 
-    let hash = await Crypto.getHash(user.password);
+    let hash = await crypto.getHash(user.password);
 
     user = {
         name: user.name,
@@ -48,29 +49,44 @@ export async function insert(user) {
 
 export async function findById(id) {
     let _id = { _id: new ObjectId(id) };
-    let result = await collection.findOne(_id, PROJECTION);
+    let user = await collection.findOne(_id, PROJECTION);
 
     return {
-        msg: `${id} ${result ? 'found' : 'not found'}`,
-        data: result
+        msg: `${id} ${user ? 'found' : 'not found'}`,
+        data: user
     };
 }
 
 export async function findByEmail(email) {
-    let result = await collection.findOne({ email }, PROJECTION);
+    let user = await collection.findOne({ email }, PROJECTION);
 
     return {
-        msg: `${email} ${result ? 'found' : 'not found'}`,
-        data: result
+        msg: `${email} ${user ? 'found' : 'not found'}`,
+        data: user
     };
 }
 
 export async function findByUsername(username) {
-    let result = await collection.findOne({ username }, PROJECTION);
+    let user = await collection.findOne({ username }, PROJECTION);
 
     return {
-        msg: `${username} ${result ? 'found' : 'not found'}`,
-        data: result
+        msg: `${username} ${user ? 'found' : 'not found'}`,
+        data: user
+    };
+}
+
+export async function findHashByUsername(username) {
+    let user = await collection.findOne({ username }, PROJECTION_WITH_PASSWORD);
+
+    if (!user) {
+        return {
+            msg: `${username} not found`,
+        };    
+    }
+
+    return {
+        msg: `${username} found`,
+        data: user.password
     };
 }
 

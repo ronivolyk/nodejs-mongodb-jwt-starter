@@ -25,11 +25,11 @@ export async function insert(person) {
 
 export async function findById(id) {
     let _id = { _id: new ObjectId(id) };
-    let result = await collection.findOne(_id);
+    let person = await collection.findOne(_id);
 
     return {
-        msg: `${id} ${result ? 'found' : 'not found'}`,
-        data: result
+        msg: `${id} ${person ? 'found' : 'not found'}`,
+        data: person
     };
 }
 
